@@ -6,11 +6,7 @@ const PORT = 3000;
 
 app.use(express.static('.'));
 
-const SUBJECTS = [
-  'toan', 'ngu_van', 'ngoai_ngu',
-  'vat_li', 'hoa_hoc', 'sinh_hoc',
-  'lich_su', 'dia_li', 'gdcd'
-];
+const SUBJECTS = ['toan', 'ngu_van', 'ngoai_ngu','vat_li', 'hoa_hoc', 'sinh_hoc','lich_su', 'dia_li', 'gdcd'];
 
 let data = [];
 
@@ -25,22 +21,21 @@ class Student {
     this.sinh_hoc = parseFloat(row.sinh_hoc) || null;
   }
 
-  // Returns total score for a given subject group (or null if missing any subject)
   getScoreForGroup(group) {
     switch (group) {
-      case 'A':   // Toán + Lý + Hóa
+      case 'A':   
         return this._valid(this.toan, this.vat_li, this.hoa_hoc) ?
           this.toan + this.vat_li + this.hoa_hoc : null;
 
-      case 'A1':  // Toán + Lý + Ngoại ngữ
+      case 'A1':  
         return this._valid(this.toan, this.vat_li, this.ngoai_ngu) ?
           this.toan + this.vat_li + this.ngoai_ngu : null;
 
-      case 'B':   // Toán + Hóa + Sinh
+      case 'B':   
         return this._valid(this.toan, this.hoa_hoc, this.sinh_hoc) ?
           this.toan + this.hoa_hoc + this.sinh_hoc : null;
 
-      case 'D':   // Toán + Văn + Ngoại ngữ
+      case 'D':   
         return this._valid(this.toan, this.ngu_van, this.ngoai_ngu) ?
           this.toan + this.ngu_van + this.ngoai_ngu : null;
 
@@ -53,7 +48,6 @@ class Student {
     return scores.every(score => typeof score === 'number' && !isNaN(score));
   }
 
-  // Return info for listing
   toGroupResult(group) {
     const total = this.getScoreForGroup(group);
     return {
@@ -71,7 +65,6 @@ class Student {
   }
 }
 
-// ✅ OOP Class for managing statistics of a subject
 class SubjectStats {
   constructor(name) {
     this.name = name;
@@ -98,13 +91,11 @@ class SubjectStats {
   }
 }
 
-// ✅ Read CSV and store student data
 fs.createReadStream('diem_thi_thpt_2024.csv')
   .pipe(csv())
   .on('data', row => data.push(row))
   .on('end', () => console.log('CSV loaded.'));
 
-// ✅ Tra cứu điểm thi theo SBD
 app.get('/tra-cuu', (req, res) => {
   const sbd = req.query.sbd;
   const student = data.find(d => d.sbd === sbd);
@@ -123,9 +114,7 @@ app.get('/tra-cuu', (req, res) => {
   res.send(output);
 });
 
-// ✅ API thống kê mức điểm theo môn học (OOP)
 app.get('/api/report', (req, res) => {
-  // Create SubjectStats instance for each subject
   const statsMap = {};
   for (const subject of SUBJECTS) {
     statsMap[subject] = new SubjectStats(subject);
@@ -141,7 +130,6 @@ app.get('/api/report', (req, res) => {
     }
   }
 
-  // Convert results to plain JSON
   const report = {};
   for (const subject in statsMap) {
     report[subject] = statsMap[subject].toJSON();

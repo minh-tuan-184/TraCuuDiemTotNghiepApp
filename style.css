@@ -1,22 +1,17 @@
-/* style.css */
-
-/* Container for whole page */
 .container {
   max-width: 1000px;
   margin: auto;
   padding: 2rem;
 }
 
-/* Title */
 .title {
   font-size: 2rem;
   font-weight: bold;
   text-align: center;
-  color: #1e40af; /* Tailwind's blue-700 */
+  color: #1e40af; 
   margin-bottom: 1.5rem;
 }
 
-/* Card-like section */
 .card {
   background-color: #ffffff;
   border-radius: 1rem;
@@ -25,7 +20,6 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-/* Flex group for input and button */
 .input-group {
   display: flex;
   flex-direction: column;
@@ -40,10 +34,9 @@
   }
 }
 
-/* Input field */
 .input {
   padding: 0.75rem 1rem;
-  border: 1px solid #cbd5e1; /* gray-300 */
+  border: 1px solid #cbd5e1; 
   border-radius: 0.5rem;
   width: 100%;
   max-width: 300px;
@@ -51,14 +44,13 @@
 }
 
 .input:focus {
-  border-color: #3b82f6; /* blue-500 */
+  border-color: #3b82f6; 
   box-shadow: 0 0 0 2px #bfdbfe;
 }
 
-/* Button */
 .button {
   padding: 0.75rem 1.5rem;
-  background-color: #2563eb; /* blue-600 */
+  background-color: #2563eb; 
   color: white;
   border: none;
   border-radius: 0.5rem;
@@ -67,13 +59,12 @@
 }
 
 .button:hover {
-  background-color: #1d4ed8; /* blue-700 */
+  background-color: #1d4ed8; 
 }
 
-/* Result box */
 .result-box {
   margin-top: 1rem;
-  background-color: #f1f5f9; /* slate-100 */
+  background-color: #f1f5f9; 
   padding: 1rem;
   border-radius: 0.5rem;
   width: 100%;
@@ -81,12 +72,11 @@
   word-break: break-word;
 }
 
-/* Section title */
 .section-title {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #374151; /* gray-700 */
+  color: #374151; 
 }
 
 h1 {
