@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tra cứu điểm THPT</title>
+  <!-- Load Tailwind from CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Custom styles -->
+  <link href="/style.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+  <div class="container">
+    <h1 class="title">🎓 Tra cứu điểm thi THPT Quốc Gia</h1>
+
+    <!-- Tra cứu điểm -->
+    <div class="card">
+      <div class="input-group">
+        <input type="text" id="sbd" placeholder="Nhập SBD (ví dụ: 01000001)" class="input" />
+        <button onclick="traCuu()" class="button">🔍 Tra cứu</button>
+      </div>
+      <pre id="result" class="result-box"></pre>
+    </div>
+
+    <!-- Biểu đồ -->
+    <div class="card">
+      <h2 class="section-title">📊 Thống kê học sinh theo mức điểm</h2>
+      <canvas id="chart" height="300"></canvas>
+    </div>
+  </div>
+
+  <script>
+    async function traCuu() {
+      const sbd = document.getElementById("sbd").value.trim();
+      if (!sbd) return alert("Vui lòng nhập SBD.");
+      const res = await fetch(`/tra-cuu?sbd=${sbd}`);
+      const data = await res.text();
+      document.getElementById("result").textContent = data;
+    }
+
+    fetch('/api/report')
+      .then(res => res.json())
+      .then(data => {
+        const subjects = Object.keys(data);
+        const datasets = [
+          { label: ">= 8", data: [], backgroundColor: "#4caf50" },
+          { label: "6 – 8", data: [], backgroundColor: "#ffca28" },
+          { label: "4 – 6", data: [], backgroundColor: "#29b6f6" },
+          { label: "< 4", data: [], backgroundColor: "#ef5350" },
+        ];
+
+        subjects.forEach(subject => {
+          datasets[0].data.push(data[subject].level1);
+          datasets[1].data.push(data[subject].level2);
+          datasets[2].data.push(data[subject].level3);
+          datasets[3].data.push(data[subject].level4);
+        });
+
+        new Chart(document.getElementById("chart"), {
+          type: "bar",
+          data: {
+            labels: subjects,
+            datasets: datasets
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: "Số học sinh theo mức điểm từng môn",
+                font: {
+                  size: 18
+                }
+              },
+              legend: {
+                position: "top"
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Số lượng"
+                }
+              }
+            }
+          }
+        });
+      });
+  </script>
+  <div class="container">
+    <h1>Top 10 thí sinh điểm cao theo khối</h1>
+    
+    <button class="tab" data-group="A" onclick="showGroup('A')">Khối A</button>
+    <button class="tab" data-group="A1" onclick="showGroup('A1')">Khối A1</button>
+    <button class="tab" data-group="B" onclick="showGroup('B')">Khối B</button>
+    <button class="tab" data-group="D" onclick="showGroup('D')">Khối D</button>
+
+    <div id="tables"></div>
+  </div>
+
+  <script>
+    let top10Data = {};
+
+    async function fetchTop10() {
+      const res = await fetch('/api/top10');
+      top10Data = await res.json();
+      showGroup('A');
+    }
+
+    function showGroup(group) {
+      document.querySelectorAll('.tab').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.group === group);
+      });
+
+      const table = document.createElement('table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>SBD</th>
+            <th>Toán</th>
+            <th>Văn</th>
+            <th>Anh</th>
+            <th>Lý</th>
+            <th>Hóa</th>
+            <th>Sinh</th>
+            <th>Tổng</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${top10Data[group].map((s, i) => `
+            <tr>
+              <td>${i + 1}</td>
+              <td>${s.sbd}</td>
+              <td>${s.subjects.toan ?? ''}</td>
+              <td>${s.subjects.ngu_van ?? ''}</td>
+              <td>${s.subjects.ngoai_ngu ?? ''}</td>
+              <td>${s.subjects.vat_li ?? ''}</td>
+              <td>${s.subjects.hoa_hoc ?? ''}</td>
+              <td>${s.subjects.sinh_hoc ?? ''}</td>
+              <td><strong>${s.total}</strong></td>
+            </tr>`).join('')}
+        </tbody>
+      `;
+
+      const container = document.getElementById('tables');
+      container.innerHTML = '';
+      container.appendChild(table);
+    }
+
+    fetchTop10();
+  </script>
+</body>
+</html>
